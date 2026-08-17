@@ -1,6 +1,7 @@
 #include "details.h"
 
 #include <algorithm>
+#include <cassert>
 #include <locale>
 
 namespace details
@@ -20,7 +21,9 @@ auto tokenize_line(const std::string_view p_line) -> std::vector<std::string_vie
             break;
         }
         const auto *word_end = std::find_if(word_start, p_line.cend(),  is_not_letter);
-        std::string_view word(word_start, std::distance(word_start, word_end));
+        const auto word_length = std::distance(word_start, word_end);
+        assert(word_length > 0);
+        std::string_view word(word_start, static_cast<size_t>(word_length));
         words.push_back(word);
         it = word_end;
     }

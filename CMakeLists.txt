@@ -18,9 +18,34 @@ add_executable(kwic
         kwic.h
         shared_data.cpp
         abstract_data.cpp
+        implicit_invocation.cpp
         details.h
         details.cpp
 )
 target_link_libraries(kwic fmt::fmt)
-
-
+target_compile_options(kwic PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wshadow
+        -Wconversion
+        -Wsign-conversion
+        -Wcast-align
+        -Wold-style-cast
+        -Wnon-virtual-dtor
+        -Woverloaded-virtual
+        -Wnull-dereference
+        -Wdouble-promotion
+        -Wformat=2
+        -Wimplicit-fallthrough
+        -Wunused
+)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(kwic PRIVATE
+            -Wuseless-cast
+            -Wlogical-op
+            -Wduplicated-cond
+            -Wduplicated-branches
+            -Wmisleading-indentation
+    )
+endif()

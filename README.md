@@ -23,6 +23,40 @@ The remaining coupling - output() needing to know both ADTs' public interfaces, 
 needing circular_shift's interface - is exactly the control coupling that Solution 2 is supposed to still have,
 per the book, rather than something to fix here.
 
+### Solution 3: Implicit Invocation
+
+Modules no longer call each other directly. Instead, a producer announces that something happened (a
+`subject<Payload>` firing a strongly-typed event), and any number of interested modules react to it
+(`observer<Payload>` instances registered against that specific event). `circular_shift` never calls
+`alphabetizer`, and neither know of each other's existence — both are wired together only by what events
+they've each subscribed to. This buys loose *control* coupling: reading the code no longer tells you what
+runs next, only what event was fired.
+
+Data coupling is a different story. `lines_tokenized` still holds shared state (`m_words`) that both
+`circular_shift` and `alphabetizer` read directly, matching what Garlan & Shaw note about their own version
+of this solution: implicit invocation loosens control coupling, not data coupling. What *is* fully hidden,
+per module, is anything each module doesn't need to expose — alphabetical order, in particular, is private
+state owned only by `alphabetizer`, exposed solely through `getalphaindex()`, so `lines_tokenized` has no
+sorting-related dependency and stays reusable by any future consumer of tokenized lines that doesn't care
+about alphabetical order.
+
+Alphabetization is also incremental rather than batch: each new-line event carries only the newly created
+shift entries, and `alphabetizer` inserts them into its own already-sorted index (`std::ranges::upper_bound`
++ `insert`) instead of re-sorting everything from scratch on every line.
+
+**Assumptions made:**
+- Input is simulated as a stream of discrete "new line" events (one per line of the source text), rather
+  than modeling a real interactive/asynchronous input source.
+- Event dispatch (`notify`) is synchronous and single-threaded — there is no concurrency, queueing, or
+  ordering concern between observers of the same event.
+- Events are strongly typed per subject (`subject<Payload>` templated on a concrete payload type) rather
+  than routed through one generic `Event` base class, so there's a distinct `subject`/`observer` pair per
+  kind of event rather than a single dispatcher for all event kinds.
+- Global objects (`g_sub_new_input`, `g_sub_new_line`, `g_lines_tokenized`) are process-lifetime singletons
+  with no reset; the solution isn't designed to be safely re-run more than once per process.
+- Observer lifetime is tied to RAII: attaching happens in the constructor, detaching in the destructor, so
+  an observer is "subscribed" for exactly as long as the corresponding C++ object is alive.
+
 
 ## References
 

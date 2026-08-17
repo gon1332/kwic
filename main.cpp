@@ -34,4 +34,6 @@ auto main(int, char *[]) -> int
     shared_data::kwic(small_text);
     fmt::println("---");
     abstract_data::kwic(small_text);
+    fmt::println("---");
+    implicit_invocation::kwic(small_text);
 }
