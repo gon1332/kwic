@@ -18,6 +18,8 @@ add_executable(kwic
         kwic.h
         shared_data.cpp
         abstract_data.cpp
+        details.h
+        details.cpp
 )
 target_link_libraries(kwic fmt::fmt)
 

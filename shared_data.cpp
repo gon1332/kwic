@@ -3,8 +3,10 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
-#include "fmt/color.h"
+#include <fmt/color.h>
 #include <fmt/format.h>
+
+#include "details.h"
 
 namespace
 {
@@ -24,29 +26,6 @@ auto input(const std::string_view p_text)
     g_characters = p_text;
 }
 
-auto tokenize_line(const std::string_view p_line)
-{
-    const auto is_letter = [](const char p_c) { return isalpha(p_c) != 0; };
-    const auto is_not_letter = [](const char p_c) { return isalpha(p_c) == 0; };
-
-    std::vector<std::string_view> words;
-
-    auto *it = p_line.cbegin();
-    while (it != p_line.cend())
-    {
-        const auto *word_start = std::find_if(it, p_line.cend(), is_letter);
-        if (word_start == p_line.cend()) {
-            break;
-        }
-        const auto *word_end = std::find_if(word_start, p_line.cend(),  is_not_letter);
-        std::string_view word(word_start, std::distance(word_start, word_end));
-        words.push_back(word);
-        it = word_end;
-    }
-
-    return words;
-}
-
 auto circular_shift()
 {
     size_t line_start = 0U;
@@ -54,7 +33,7 @@ auto circular_shift()
         if (i == g_characters.length() || g_characters.at(i) == '\n') {
             const auto len = i - line_start;
             const auto line = std::string_view(&g_characters.at(line_start), len);
-            g_words.push_back(tokenize_line(line));
+            g_words.push_back(details::tokenize_line(line));
 
             const auto line_index = g_words.size() - 1;
             for (size_t word_index = 0U; word_index < g_words.at(line_index).size(); ++word_index) {

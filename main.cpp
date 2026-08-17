@@ -1,5 +1,6 @@
 #include <string_view>
 #include "kwic.h"
+#include <fmt/format.h>
 
 constexpr std::string_view small_text = R""""(Small text to
 test the
@@ -31,5 +32,6 @@ No doubt I now grew very pale; — but I talked more fluently, and with a height
 auto main(int, char *[]) -> int
 {
     shared_data::kwic(small_text);
-    // abstract_data::kwic(small_text);
+    fmt::println("---");
+    abstract_data::kwic(small_text);
 }
