@@ -19,6 +19,7 @@ add_executable(kwic
         shared_data.cpp
         abstract_data.cpp
         implicit_invocation.cpp
+        filters.cpp
         details.h
         details.cpp
 )

@@ -16,3 +16,8 @@ namespace implicit_invocation
 {
     auto kwic(std::string_view p_text) -> void;
 } // namespace implicit_invocation
+
+namespace filters
+{
+    auto kwic(std::string_view p_text) -> void;
+} // namespace filters

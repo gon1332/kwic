@@ -47,7 +47,7 @@ shift entries, and `alphabetizer` inserts them into its own already-sorted index
 **Assumptions made:**
 - Input is simulated as a stream of discrete "new line" events (one per line of the source text), rather
   than modeling a real interactive/asynchronous input source.
-- Event dispatch (`notify`) is synchronous and single-threaded — there is no concurrency, queueing, or
+- Event dispatch (`notify`) is synchronous and single-threaded - there is no concurrency, queueing, or
   ordering concern between observers of the same event.
 - Events are strongly typed per subject (`subject<Payload>` templated on a concrete payload type) rather
   than routed through one generic `Event` base class, so there's a distinct `subject`/`observer` pair per
@@ -56,6 +56,20 @@ shift entries, and `alphabetizer` inserts them into its own already-sorted index
   with no reset; the solution isn't designed to be safely re-run more than once per process.
 - Observer lifetime is tied to RAII: attaching happens in the constructor, detaching in the destructor, so
   an observer is "subscribed" for exactly as long as the corresponding C++ object is alive.
+
+### Solution 4: Pipes and Filters
+
+Input, Circular Shift, Alphabetize, and Output are independent functions chained together, each consuming
+only what its immediate predecessor produced and returning a new value for the next stage — no shared
+state, no globals, no reaching back past an adjacent stage. `circular_shift`'s output (`shifted_lines`,
+bundling word content and shift indices into one payload) is the pipe that both `alphabetize` and `output`
+depend on, kept explicit as a single named type rather than threaded loosely through every signature.
+
+This gets simplicity, an intuitive top-to-bottom flow, and easy reuse of individual filters - but it's
+strictly batch: control only ever flows one way, so there's no way to add "delete a line" or any interactive
+capability without introducing persistent shared storage, which breaks the model. It's also inherently
+less space-efficient, since data conceptually flows forward through the pipeline rather than being
+mutated in place.
 
 
 ## References

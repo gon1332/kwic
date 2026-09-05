@@ -1,7 +1,6 @@
 #include "kwic.h"
 
 #include <algorithm>
-#include <iterator>
 #include <vector>
 #include <fmt/color.h>
 #include <fmt/format.h>
@@ -16,40 +15,46 @@ struct shift_entry
     size_t word_index;
 };
 
-std::string_view g_characters;
-std::vector<std::vector<std::string_view>> g_words; // words per line
-std::vector<shift_entry> g_index;
-std::vector<shift_entry> g_alpha_index;
+struct shifted_lines
+{
+    std::vector<std::vector<std::string_view>> words;
+    std::vector<shift_entry> index;
+};
 
 auto input(const std::string_view p_text)
 {
-    g_characters = p_text;
+    return p_text;
 }
 
-auto circular_shift()
+auto circular_shift(const std::string_view p_text)
 {
-    size_t line_start = 0U;
-    for (size_t i = 0U; i <= g_characters.length(); ++i) {
-        if (i == g_characters.length() || g_characters.at(i) == '\n') {
-            const auto len = i - line_start;
-            const auto line = g_characters.substr(line_start, len);
-            g_words.push_back(details::tokenize_line(line));
+    std::vector<std::vector<std::string_view>> words; // words per line
+    std::vector<shift_entry> index;
 
-            const auto line_index = g_words.size() - 1;
-            for (size_t word_index = 0U; word_index < g_words.at(line_index).size(); ++word_index) {
-                g_index.emplace_back(line_index, word_index);
+    size_t line_start = 0U;
+    for (size_t i = 0U; i <= p_text.length(); ++i) {
+        if (i == p_text.length() || p_text.at(i) == '\n') {
+            const auto len = i - line_start;
+            const auto line = p_text.substr(line_start, len);
+            words.push_back(details::tokenize_line(line));
+
+            const auto line_index = words.size() - 1;
+            for (size_t word_index = 0U; word_index < words.at(line_index).size(); ++word_index) {
+                index.emplace_back(line_index, word_index);
             }
             line_start = i + 1;
         }
     }
+
+    return shifted_lines{words, index};
 }
 
-auto alphabetize()
+auto alphabetize(const shifted_lines &p_shifted)
 {
-    g_alpha_index = g_index;
-    std::ranges::sort(g_alpha_index, [](const shift_entry &p_lhs, const shift_entry &p_rhs) -> bool {
-        const auto &lwords = g_words.at(p_lhs.line_index);
-        const auto &rwords = g_words.at(p_rhs.line_index);
+    std::vector<shift_entry> alpha_index = p_shifted.index;
+    std::ranges::sort(alpha_index, [&p_shifted](const shift_entry &p_lhs, const shift_entry &p_rhs) -> bool {
+        const auto &lwords = p_shifted.words.at(p_lhs.line_index);
+        const auto &rwords = p_shifted.words.at(p_rhs.line_index);
         const auto min_words_per_line = std::min(lwords.size(), rwords.size());
         for (size_t i = 0; i < min_words_per_line; ++i) {
             const auto lword = lwords.at((p_lhs.word_index + i) % lwords.size());
@@ -58,12 +63,14 @@ auto alphabetize()
         }
         return lwords.size() < rwords.size();
     });
+
+    return alpha_index;
 }
 
-auto output(size_t p_width) -> void
+auto output(const shifted_lines &p_shifted, const std::vector<shift_entry> &p_alpha_index, size_t p_width) -> void
 {
-    for (const auto &[line_index, word_index] : g_alpha_index) {
-        const auto &words = g_words[line_index];
+    for (const auto &[line_index, word_index] : p_alpha_index) {
+        const auto &words = p_shifted.words[line_index];
         const auto &kw = words[word_index];
 
         std::string right;
@@ -99,10 +106,10 @@ auto output(size_t p_width) -> void
 }
 } // namespace
 
-auto shared_data::kwic(const std::string_view p_text) -> void
+auto filters::kwic(const std::string_view p_text) -> void
 {
-    input(p_text);
-    circular_shift();
-    alphabetize();
-    output(40);
+    const auto characters = input(p_text);
+    const auto shifted = circular_shift(characters);
+    const auto alpha_index = alphabetize(shifted);
+    output(shifted, alpha_index, 40);
 }
