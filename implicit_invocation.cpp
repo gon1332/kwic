@@ -88,7 +88,7 @@ class lines_tokenized
     std::vector<std::vector<std::string_view>> m_words;
 
 public:
-    auto insert(std::vector<std::string_view> p_line) -> void {
+    auto insert(const std::vector<std::string_view> &p_line) -> void {
         m_words.push_back(p_line);
         const auto line_index = m_words.size() - 1;
 
@@ -157,7 +157,7 @@ public:
     }
 };
 
-auto input(const std::string_view p_text) -> void
+auto input(const std::string_view &p_text) -> void
 {
     size_t line_start = 0U;
     for (size_t i = 0U; i <= p_text.length(); ++i) {
@@ -209,11 +209,12 @@ auto output(const alphabetizer &p_alpha_shift, const lines_tokenized &p_lines, s
 }
 } // namespace
 
-auto implicit_invocation::kwic(const std::string_view p_text) -> void
+auto implicit_invocation::kwic(const std::string &p_path, size_t p_width) -> void
 {
     circular_shift shifter{g_sub_new_input};
     alphabetizer alpha{g_sub_new_line};
 
-    input(p_text);
-    output(alpha, g_lines_tokenized, 40);
+    const auto text = details::read_file(p_path);
+    input(text);
+    output(alpha, g_lines_tokenized, p_width);
 }

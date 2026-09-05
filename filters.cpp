@@ -21,9 +21,9 @@ struct shifted_lines
     std::vector<shift_entry> index;
 };
 
-auto input(const std::string_view p_text)
+auto input(const std::string &p_path)
 {
-    return p_text;
+    return details::read_file(p_path);
 }
 
 auto circular_shift(const std::string_view p_text)
@@ -35,7 +35,7 @@ auto circular_shift(const std::string_view p_text)
     for (size_t i = 0U; i <= p_text.length(); ++i) {
         if (i == p_text.length() || p_text.at(i) == '\n') {
             const auto len = i - line_start;
-            const auto line = p_text.substr(line_start, len);
+            const auto line = std::string_view(&p_text.at(line_start), len);
             words.push_back(details::tokenize_line(line));
 
             const auto line_index = words.size() - 1;
@@ -106,10 +106,10 @@ auto output(const shifted_lines &p_shifted, const std::vector<shift_entry> &p_al
 }
 } // namespace
 
-auto filters::kwic(const std::string_view p_text) -> void
+auto filters::kwic(const std::string &p_path, size_t p_width) -> void
 {
-    const auto characters = input(p_text);
+    const auto characters = input(p_path);
     const auto shifted = circular_shift(characters);
     const auto alpha_index = alphabetize(shifted);
-    output(shifted, alpha_index, 40);
+    output(shifted, alpha_index, p_width);
 }

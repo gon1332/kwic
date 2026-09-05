@@ -10,6 +10,12 @@ FetchContent_Declare(
         GIT_TAG        e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
 FetchContent_MakeAvailable(fmt)
 
+FetchContent_Declare(
+        cli11
+        GIT_REPOSITORY https://github.com/CLIUtils/CLI11
+        GIT_TAG        v2.4.2)
+FetchContent_MakeAvailable(cli11)
+
 # --- Settings
 set(CMAKE_CXX_STANDARD 20)
 
@@ -23,7 +29,7 @@ add_executable(kwic
         details.h
         details.cpp
 )
-target_link_libraries(kwic fmt::fmt)
+target_link_libraries(kwic fmt::fmt CLI11::CLI11)
 target_compile_options(kwic PRIVATE
         -Wall
         -Wextra

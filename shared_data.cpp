@@ -16,14 +16,14 @@ struct shift_entry
     size_t word_index;
 };
 
-std::string_view g_characters;
+std::string g_characters;
 std::vector<std::vector<std::string_view>> g_words; // words per line
 std::vector<shift_entry> g_index;
 std::vector<shift_entry> g_alpha_index;
 
-auto input(const std::string_view p_text)
+auto input(const std::string &p_path)
 {
-    g_characters = p_text;
+    g_characters = details::read_file(p_path);
 }
 
 auto circular_shift()
@@ -32,7 +32,7 @@ auto circular_shift()
     for (size_t i = 0U; i <= g_characters.length(); ++i) {
         if (i == g_characters.length() || g_characters.at(i) == '\n') {
             const auto len = i - line_start;
-            const auto line = g_characters.substr(line_start, len);
+            const auto line = std::string_view(&g_characters.at(line_start), len);
             g_words.push_back(details::tokenize_line(line));
 
             const auto line_index = g_words.size() - 1;
@@ -99,10 +99,10 @@ auto output(size_t p_width) -> void
 }
 } // namespace
 
-auto shared_data::kwic(const std::string_view p_text) -> void
+auto shared_data::kwic(const std::string &p_path, size_t p_width) -> void
 {
-    input(p_text);
+    input(p_path);
     circular_shift();
     alphabetize();
-    output(40);
+    output(p_width);
 }

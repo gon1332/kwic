@@ -102,9 +102,9 @@ public:
     }
 };
 
-auto input(const std::string_view p_text) -> characters
+auto input(const std::string &p_path) -> characters
 {
-    return characters{p_text};
+    return characters{details::read_file(p_path)};
 }
 
 auto output(const circular_shift &p_circ_shift, const alpha_shift &p_alpha_shift, size_t p_width) -> void
@@ -146,10 +146,10 @@ auto output(const circular_shift &p_circ_shift, const alpha_shift &p_alpha_shift
 }
 } // namespace
 
-auto abstract_data::kwic(const std::string_view p_text) -> void
+auto abstract_data::kwic(const std::string &p_path, size_t p_width) -> void
 {
-    const auto characters = input(p_text);
+    const auto characters = input(p_path);
     const circular_shift circ_shift{characters};
     const alpha_shift alpha_shift{circ_shift};
-    output(circ_shift, alpha_shift, 40);
+    output(circ_shift, alpha_shift, p_width);
 }

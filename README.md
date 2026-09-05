@@ -3,6 +3,19 @@
 Based on Chapter 3 of _Software Architecture: Perspectives on an Emerging Discipline, Mary Shaw, David Garlan_
 this repository is using the KWIC to showcase various architectural styles.
 
+Example output:
+```
+> ./cmake-build-debug-system/kwic --method shared_data --file tests/small --width 40
+                       implementation of KWIC implementation of                       
+                                 text to Small text to                                 
+                                 of KWIC implementation of KWIC                                 
+                     KWIC implementation of KWIC implementation                     
+                                     the test the                                     
+                                to Small text to Small                                
+                                    test the test                                    
+                              Small text to Small text
+```
+
 ## The many faces of KWIC
 
 ### Solution 1: Main Program/Subroutine with Shared Data

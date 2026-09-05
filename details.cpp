@@ -3,9 +3,24 @@
 #include <algorithm>
 #include <cassert>
 #include <locale>
+#include <sstream>
+#include <stdexcept>
+#include <fstream>
+#include <fmt/format.h>
 
 namespace details
 {
+auto read_file(const std::string &p_path) -> std::string
+{
+    std::ifstream file(p_path, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error(fmt::format("could not open file: {}", p_path));
+    }
+    std::ostringstream contents;
+    contents << file.rdbuf();
+    return contents.str();
+}
+
 auto tokenize_line(const std::string_view p_line) -> std::vector<std::string_view>
 {
     const auto is_letter = [](const char p_c) { return isalpha(p_c) != 0; };
