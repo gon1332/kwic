@@ -1,0 +1,8 @@
+                       implementation of [1mKWIC[0m implementation of                       
+                                 text to [1mSmall[0m text to                                 
+                                 of KWIC [1mimplementation[0m of KWIC                                 
+                     KWIC implementation [1mof[0m KWIC implementation                     
+                                     the [1mtest[0m the                                     
+                                to Small [1mtext[0m to Small                                
+                                    test [1mthe[0m test                                    
+                              Small text [1mto[0m Small text                              
