@@ -1,2 +1,22 @@
+# Build directories
 cmake-build*
+build/
+build-fuzz/
+
+# IDE
 .idea/*
+
+# CMake user-specific presets
+CMakeUserPresets.json
+
+# Fuzzer artifacts (crashes/ and discovered inputs — keep seed corpus tracked separately if desired)
+fuzz/corpus/*
+!fuzz/corpus/.gitkeep
+crash-*
+oom-*
+timeout-*
+leak-*
+
+# clangd / IDE tooling index
+.cache/
+compile_commands.json
