@@ -11,8 +11,11 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y ninja-build
       - run: cmake --preset gcc-release
+      - run: cmake --preset clang-release
       - run: cmake --build --preset gcc-release
+      - run: cmake --build --preset clang-release
       - run: ./scripts/run_golden_tests.sh build/gcc-release/kwic
+      - run: ./scripts/run_golden_tests.sh build/clang-release/kwic
 
   fuzz-smoke-test:
     runs-on: ubuntu-latest
